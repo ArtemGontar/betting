@@ -53,7 +53,7 @@ func authHttpGetRequest(url string, authToken string) []byte {
 	return body
 }
 
-func arrToMatchResultsMapping(record []string) models.MatchResults {
+func arrToMatchResultsMapping(record []string) models.MatchResult {
 	fullTimeHomeTeamGoals, _ := strconv.Atoi(record[4])
 	fullTimeAwayTeamGoals, _ := strconv.Atoi(record[5])
 
@@ -79,7 +79,7 @@ func arrToMatchResultsMapping(record []string) models.MatchResults {
 	awayTeamRedCards, _ := strconv.Atoi(record[22])
 
 	dateStart, _ := time.Parse(time.RFC3339, record[1])
-	matches := models.MatchResults{
+	matches := models.MatchResult{
 		HomeTeam:               record[2],
 		HomeTeamId:             0,
 		FullTimeHomeTeamGoals:  fullTimeHomeTeamGoals,
@@ -109,7 +109,7 @@ func arrToMatchResultsMapping(record []string) models.MatchResults {
 	return matches
 }
 
-func readMatchResultsFromDataset(filePath string) []models.MatchResults {
+func readMatchResultsFromDataset(filePath string) []models.MatchResult {
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
@@ -117,7 +117,7 @@ func readMatchResultsFromDataset(filePath string) []models.MatchResults {
 
 	defer file.Close()
 
-	matchesResults := []models.MatchResults{}
+	matchesResults := []models.MatchResult{}
 	reader := csv.NewReader(file)
 	reader.FieldsPerRecord = 23
 	for {

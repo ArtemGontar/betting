@@ -19,7 +19,7 @@ func InsertLeagues(db *sql.DB, leagues []models.League) {
 	}
 }
 
-func InsertMatchResults(db *sql.DB, matchResults []models.MatchResults) {
+func InsertMatchResults(db *sql.DB, matchResults []models.MatchResult) {
 	for _, matchResult := range matchResults {
 		fmt.Println(matchResult)
 		_, err := db.Exec(`INSERT INTO public.match_results (home_team, home_team_id, full_time_home_team_goals, 

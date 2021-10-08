@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type MatchResults struct {
+type MatchResult struct {
 	Id                     int
 	HomeTeam               string    `json:"home_team"`
 	HomeTeamId             int       `json:"home_team_id"`
