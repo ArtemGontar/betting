@@ -4,13 +4,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"strconv"
-	"time"
 
-	"encoding/csv"
-
-	"github.com/ArtemGontar/betting/internal/app/models"
+	"github.com/ArtemGontar/betting/internal/app/reader"
 	"github.com/ArtemGontar/betting/internal/app/store"
 	_ "github.com/lib/pq"
 )
@@ -31,8 +26,65 @@ func main() {
 	// 	"ef005110a34b481d9c1931075d779c71ed33058d80834b48b852b469bb5e7742")
 	// fmt.Println(string(rawData))
 
-	matchesResults := readMatchResultsFromDataset("dataset/E0.csv")
+	matchesResults := reader.ReadMatchResultsFromDataset("dataset/E0_2021_2.csv")
 	store.InsertMatchResults(db, matchesResults)
+
+	homeTeam := "Everton"
+	awayTeam := "Chelsea"
+	avgHomeScoredGoals, avgHomeConcededGoals, err := store.SelectHomeTeamAvgGoals(db, homeTeam)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	homeFullTimeResults, err := store.SelectLastFiveGamesByTeam(db, homeTeam)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Home team stats")
+	fmt.Println(homeTeam, "Avg home scored goals =", avgHomeScoredGoals)
+	fmt.Println(homeTeam, "Avg home conceded goals =", avgHomeConcededGoals)
+	fmt.Print(homeTeam, "Last 5 games results = ")
+	ProcessResults(homeFullTimeResults, homeTeam)
+
+	avgAwayScoredGoals, avgAwayConcededGoals, _ := store.SelectAwayTeamAvgGoals(db, awayTeam)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	awayFullTimeResults, _ := store.SelectLastFiveGamesByTeam(db, awayTeam)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println("Away team stats")
+	fmt.Println(awayTeam, "Avg home scored goals =", avgAwayScoredGoals)
+	fmt.Println(awayTeam, "Avg home conceded goals =", avgAwayConcededGoals)
+	fmt.Print(homeTeam, "Last 5 games results = ")
+	ProcessResults(awayFullTimeResults, awayTeam)
+
+	eachOtherGames, err := store.SelectAgainstEachOtherResults(db, homeTeam, awayTeam)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(eachOtherGames)
+}
+
+func ProcessResults(results []store.Results, team string) {
+	defer fmt.Println()
+	for _, result := range results {
+		if result.Result == "H" {
+			fmt.Print("W ")
+		} else if result.AwayTeam == team && result.Result == "A" {
+			fmt.Print("W ")
+		} else if result.HomeTeam == team && result.Result == "A" {
+			fmt.Print("L ")
+		} else if result.AwayTeam == team && result.Result == "H" {
+			fmt.Print("L ")
+		} else {
+			fmt.Print("D ")
+		}
+	}
 }
 
 func authHttpGetRequest(url string, authToken string) []byte {
@@ -51,83 +103,4 @@ func authHttpGetRequest(url string, authToken string) []byte {
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	return body
-}
-
-func arrToMatchResultsMapping(record []string) models.MatchResult {
-	fullTimeHomeTeamGoals, _ := strconv.Atoi(record[4])
-	fullTimeAwayTeamGoals, _ := strconv.Atoi(record[5])
-
-	halfTimeHomeTeamGoals, _ := strconv.Atoi(record[7])
-	halfTimeAwayTeamGoals, _ := strconv.Atoi(record[8])
-
-	homeTeamShots, _ := strconv.Atoi(record[11])
-	awayTeamShots, _ := strconv.Atoi(record[12])
-
-	homeTeamShotsOnTarget, _ := strconv.Atoi(record[13])
-	awayTeamShotsOnTarget, _ := strconv.Atoi(record[14])
-
-	homeTeamFoulsCommitted, _ := strconv.Atoi(record[15])
-	awayTeamFoulsCommitted, _ := strconv.Atoi(record[16])
-
-	homeTeamCorners, _ := strconv.Atoi(record[17])
-	awayTeamCorners, _ := strconv.Atoi(record[18])
-
-	homeTeamYellowCards, _ := strconv.Atoi(record[19])
-	awayTeamYellowCards, _ := strconv.Atoi(record[20])
-
-	homeTeamRedCards, _ := strconv.Atoi(record[21])
-	awayTeamRedCards, _ := strconv.Atoi(record[22])
-
-	dateStart, _ := time.Parse(time.RFC3339, record[1])
-	matches := models.MatchResult{
-		HomeTeam:               record[2],
-		HomeTeamId:             0,
-		FullTimeHomeTeamGoals:  fullTimeHomeTeamGoals,
-		HalfTimeHomeTeamGoals:  halfTimeHomeTeamGoals,
-		HomeTeamShots:          homeTeamShots,
-		HomeTeamShotsOnTarget:  homeTeamShotsOnTarget,
-		HomeTeamCorners:        homeTeamCorners,
-		HomeTeamFoulsCommitted: homeTeamFoulsCommitted,
-		HomeTeamYellowCards:    homeTeamYellowCards,
-		HomeTeamRedCards:       homeTeamRedCards,
-		AwayTeam:               record[3],
-		AwayTeamId:             0,
-		FullTimeAwayTeamGoals:  fullTimeAwayTeamGoals,
-		HalfTimeAwayTeamGoals:  halfTimeAwayTeamGoals,
-		AwayTeamShots:          awayTeamShots,
-		AwayTeamShotsOnTarget:  awayTeamShotsOnTarget,
-		AwayTeamCorners:        awayTeamCorners,
-		AwayTeamFoulsCommitted: awayTeamFoulsCommitted,
-		AwayTeamYellowCards:    awayTeamYellowCards,
-		AwayTeamRedCards:       awayTeamRedCards,
-		FullTimeResult:         record[6],
-		HalfTimeResult:         record[9],
-		DateStart:              dateStart,
-		LeagueId:               1,
-	}
-
-	return matches
-}
-
-func readMatchResultsFromDataset(filePath string) []models.MatchResult {
-	file, err := os.Open(filePath)
-	if err != nil {
-		panic(err)
-	}
-
-	defer file.Close()
-
-	matchesResults := []models.MatchResult{}
-	reader := csv.NewReader(file)
-	reader.FieldsPerRecord = 23
-	for {
-		record, e := reader.Read()
-		if e != nil {
-			fmt.Println(e)
-			break
-		}
-		matchesResults = append(matchesResults, arrToMatchResultsMapping(record))
-	}
-
-	return matchesResults
 }

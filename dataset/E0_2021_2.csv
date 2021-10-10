@@ -1,0 +1,70 @@
+E0,2021-08-13T20:00:00.000Z,Brentford,Arsenal,2,0,H,1,0,H,M Oliver,8,22,3,4,12,8,2,5,0,0,0,0
+E0,2021-08-14T12:30:00.000Z,Man United,Leeds,5,1,H,1,0,H,P Tierney,16,10,8,3,11,9,5,4,1,2,0,0
+E0,2021-08-14T15:00:00.000Z,Burnley,Brighton,1,2,A,1,0,H,D Coote,14,14,3,8,10,7,7,6,2,1,0,0
+E0,2021-08-14T15:00:00.000Z,Chelsea,Crystal Palace,3,0,H,2,0,H,J Moss,13,4,6,1,15,11,5,2,0,0,0,0
+E0,2021-08-14T15:00:00.000Z,Everton,Southampton,3,1,H,0,1,A,A Madley,14,6,6,3,13,15,6,8,2,0,0,0
+E0,2021-08-14T15:00:00.000Z,Leicester,Wolves,1,0,H,1,0,H,C Pawson,9,17,5,3,6,10,5,4,1,2,0,0
+E0,2021-08-14T15:00:00.000Z,Watford,Aston Villa,3,2,H,2,0,H,M Dean,13,11,7,2,18,13,2,4,3,1,0,0
+E0,2021-08-14T17:30:00.000Z,Norwich,Liverpool,0,3,A,0,1,A,A Marriner,14,19,3,8,4,14,3,11,1,1,0,0
+E0,2021-08-15T14:00:00.000Z,Newcastle,West Ham,2,4,A,2,1,H,M Atkinson,17,8,3,9,4,3,7,6,1,0,0,0
+E0,2021-08-15T16:30:00.000Z,Tottenham,Man City,1,0,H,0,0,D,A Taylor,13,18,3,4,11,8,3,11,2,1,0,0
+E0,2021-08-21T12:30:00.000Z,Liverpool,Burnley,2,0,H,1,0,H,M Dean,27,9,9,3,6,12,8,4,0,0,0,0
+E0,2021-08-21T15:00:00.000Z,Aston Villa,Newcastle,2,0,H,1,0,H,D Coote,10,9,2,1,8,18,3,4,3,4,0,0
+E0,2021-08-21T15:00:00.000Z,Crystal Palace,Brentford,0,0,D,0,0,D,M Atkinson,7,14,2,3,12,9,3,5,3,1,0,0
+E0,2021-08-21T15:00:00.000Z,Leeds,Everton,2,2,D,1,1,D,D England,17,17,4,8,6,13,8,5,2,4,0,0
+E0,2021-08-21T15:00:00.000Z,Man City,Norwich,5,0,H,2,0,H,G Scott,16,1,4,0,13,7,6,1,1,0,0,0
+E0,2021-08-21T17:30:00.000Z,Brighton,Watford,2,0,H,2,0,H,A Taylor,13,10,3,1,11,6,7,2,4,0,0,0
+E0,2021-08-22T14:00:00.000Z,Southampton,Man United,1,1,D,1,0,H,C Pawson,8,15,3,4,12,10,7,7,2,3,0,0
+E0,2021-08-22T14:00:00.000Z,Wolves,Tottenham,0,1,A,0,1,A,S Attwell,25,8,6,6,9,7,5,4,1,4,0,0
+E0,2021-08-22T16:30:00.000Z,Arsenal,Chelsea,0,2,A,0,2,A,P Tierney,6,22,3,5,10,4,9,8,3,0,0,0
+E0,2021-08-23T20:00:00.000Z,West Ham,Leicester,4,1,H,1,0,H,M Oliver,13,5,7,1,8,8,10,0,0,1,0,1
+E0,2021-08-28T12:30:00.000Z,Man City,Arsenal,5,0,H,3,0,H,M Atkinson,25,1,10,0,5,7,14,0,1,2,0,1
+E0,2021-08-28T15:00:00.000Z,Aston Villa,Brentford,1,1,D,1,1,D,P Bankes,7,9,5,2,15,14,3,2,3,3,0,0
+E0,2021-08-28T15:00:00.000Z,Brighton,Everton,0,2,A,0,1,A,J Moss,14,14,3,5,7,9,4,5,1,2,0,0
+E0,2021-08-28T15:00:00.000Z,Newcastle,Southampton,2,2,D,0,0,D,P Tierney,10,22,5,6,11,6,4,4,3,3,0,0
+E0,2021-08-28T15:00:00.000Z,Norwich,Leicester,1,2,A,1,1,D,R Jones,14,9,4,3,8,9,9,9,2,1,0,0
+E0,2021-08-28T15:00:00.000Z,West Ham,Crystal Palace,2,2,D,1,0,H,S Attwell,14,9,4,2,10,7,5,3,1,0,0,0
+E0,2021-08-28T17:30:00.000Z,Liverpool,Chelsea,1,1,D,1,1,D,A Taylor,24,6,7,3,13,4,12,3,0,2,0,1
+E0,2021-08-29T14:00:00.000Z,Burnley,Leeds,1,1,D,0,0,D,M Oliver,12,12,3,2,13,9,5,5,4,3,0,0
+E0,2021-08-29T14:00:00.000Z,Tottenham,Watford,1,0,H,1,0,H,A Marriner,15,9,8,2,8,14,10,3,3,3,0,0
+E0,2021-08-29T16:30:00.000Z,Wolves,Man United,0,1,A,0,0,D,M Dean,15,10,6,3,7,9,5,7,3,4,0,0
+E0,2021-09-11T12:30:00.000Z,Crystal Palace,Tottenham,3,0,H,0,0,D,J Moss,18,2,4,1,13,15,8,2,2,1,0,1
+E0,2021-09-11T15:00:00.000Z,Arsenal,Norwich,1,0,H,0,0,D,M Oliver,30,10,7,1,9,11,8,4,1,2,0,0
+E0,2021-09-11T15:00:00.000Z,Brentford,Brighton,0,1,A,0,0,D,G Scott,7,4,1,2,9,12,1,6,3,2,0,0
+E0,2021-09-11T15:00:00.000Z,Leicester,Man City,0,1,A,0,0,D,P Tierney,6,25,1,8,4,11,5,8,1,2,0,0
+E0,2021-09-11T15:00:00.000Z,Man United,Newcastle,4,1,H,1,0,H,A Taylor,21,12,7,3,9,2,7,3,1,0,0,0
+E0,2021-09-11T15:00:00.000Z,Southampton,West Ham,0,0,D,0,0,D,D Coote,11,13,3,3,10,12,5,4,3,1,0,1
+E0,2021-09-11T15:00:00.000Z,Watford,Wolves,0,2,A,0,0,D,P Bankes,6,14,2,5,15,13,6,8,3,3,0,0
+E0,2021-09-11T17:30:00.000Z,Chelsea,Aston Villa,3,0,H,1,0,H,S Attwell,12,18,4,6,11,11,4,11,1,4,0,0
+E0,2021-09-12T16:30:00.000Z,Leeds,Liverpool,0,3,A,0,1,A,C Pawson,9,30,4,9,9,8,2,11,2,1,1,0
+E0,2021-09-13T20:00:00.000Z,Everton,Burnley,3,1,H,0,0,D,M Atkinson,14,11,6,6,3,6,4,6,1,1,0,0
+E0,2021-09-17T20:00:00.000Z,Newcastle,Leeds,1,1,D,1,1,D,M Dean,17,22,7,9,9,11,4,5,2,2,0,0
+E0,2021-09-18T12:30:00.000Z,Wolves,Brentford,0,2,A,0,2,A,D England,11,9,0,3,10,7,4,2,4,2,0,1
+E0,2021-09-18T15:00:00.000Z,Burnley,Arsenal,0,1,A,0,1,A,A Taylor,18,13,3,3,9,8,8,3,2,1,0,0
+E0,2021-09-18T15:00:00.000Z,Liverpool,Crystal Palace,3,0,H,1,0,H,A Madley,25,13,10,2,17,11,10,5,3,1,0,0
+E0,2021-09-18T15:00:00.000Z,Man City,Southampton,0,0,D,0,0,D,J Moss,18,10,1,2,5,12,8,5,0,2,0,0
+E0,2021-09-18T15:00:00.000Z,Norwich,Watford,1,3,A,1,1,D,R Jones,12,12,5,8,10,14,4,8,1,1,0,0
+E0,2021-09-18T17:30:00.000Z,Aston Villa,Everton,3,0,H,0,0,D,C Pawson,15,11,3,1,7,10,5,4,1,1,0,0
+E0,2021-09-19T14:00:00.000Z,Brighton,Leicester,2,1,H,1,0,H,S Attwell,12,14,5,3,8,10,4,9,2,1,0,0
+E0,2021-09-19T14:00:00.000Z,West Ham,Man United,1,2,A,1,1,D,M Atkinson,13,17,4,10,5,8,2,11,0,0,0,0
+E0,2021-09-19T16:30:00.000Z,Tottenham,Chelsea,0,3,A,0,0,D,P Tierney,8,20,2,10,4,15,5,11,0,1,0,0
+E0,2021-09-25T12:30:00.000Z,Chelsea,Man City,0,1,A,0,0,D,M Oliver,5,15,0,4,12,10,4,13,3,2,0,0
+E0,2021-09-25T12:30:00.000Z,Man United,Aston Villa,0,1,A,0,0,D,M Dean,28,7,4,3,9,13,5,5,2,2,0,0
+E0,2021-09-25T15:00:00.000Z,Everton,Norwich,2,0,H,1,0,H,D Coote,11,10,4,2,12,9,6,4,2,3,0,0
+E0,2021-09-25T15:00:00.000Z,Leeds,West Ham,1,2,A,1,0,H,K Friend,15,20,5,7,10,6,5,7,3,2,0,0
+E0,2021-09-25T15:00:00.000Z,Leicester,Burnley,2,2,D,1,2,A,C Kavanagh,22,9,5,3,10,8,8,4,2,4,0,0
+E0,2021-09-25T15:00:00.000Z,Watford,Newcastle,1,1,D,0,1,A,J Gillett,15,20,4,6,19,12,5,6,4,3,0,0
+E0,2021-09-25T17:30:00.000Z,Brentford,Liverpool,3,3,D,1,1,D,S Attwell,12,16,4,6,8,7,2,11,1,1,0,0
+E0,2021-09-26T14:00:00.000Z,Southampton,Wolves,0,1,A,0,0,D,A Madley,18,5,6,3,12,8,5,5,0,0,0,0
+E0,2021-09-26T16:30:00.000Z,Arsenal,Tottenham,3,1,H,3,0,H,C Pawson,12,10,7,4,12,13,4,4,2,1,0,0
+E0,2021-09-27T20:00:00.000Z,Crystal Palace,Brighton,1,1,D,1,0,H,A Marriner,8,8,3,4,12,10,6,5,2,3,0,0
+E0,2021-10-02T12:30:00.000Z,Man United,Everton,1,1,D,1,0,H,M Oliver,13,12,6,2,10,9,10,1,1,1,0,0
+E0,2021-10-02T15:00:00.000Z,Burnley,Norwich,0,0,D,0,0,D,K Friend,14,10,4,2,13,3,9,5,5,2,0,0
+E0,2021-10-02T15:00:00.000Z,Chelsea,Southampton,3,1,H,1,0,H,M Atkinson,20,6,9,2,11,13,7,2,1,3,0,1
+E0,2021-10-02T15:00:00.000Z,Leeds,Watford,1,0,H,1,0,H,S Hooper,20,5,4,1,10,16,6,3,0,3,0,0
+E0,2021-10-02T15:00:00.000Z,Wolves,Newcastle,2,1,H,1,1,D,G Scott,7,8,3,2,15,5,0,4,0,2,0,0
+E0,2021-10-02T17:30:00.000Z,Brighton,Arsenal,0,0,D,0,0,D,J Moss,21,8,2,2,8,5,8,5,2,1,0,0
+E0,2021-10-03T14:00:00.000Z,Crystal Palace,Leicester,2,2,D,0,2,A,A Taylor,18,9,4,5,15,11,1,3,2,3,0,0
+E0,2021-10-03T14:00:00.000Z,Tottenham,Aston Villa,2,1,H,1,0,H,C Kavanagh,17,14,8,3,11,14,5,8,2,1,0,0
+E0,2021-10-03T14:00:00.000Z,West Ham,Brentford,1,2,A,0,1,A,P Bankes,18,13,5,6,16,13,11,6,2,3,0,0
+E0,2021-10-03T16:30:00.000Z,Liverpool,Man City,2,2,D,0,0,D,P Tierney,6,12,4,3,10,12,3,4,3,3,0,0

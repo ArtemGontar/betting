@@ -7,6 +7,91 @@ import (
 	"github.com/ArtemGontar/betting/internal/app/models"
 )
 
+func SelectHomeTeamAvgGoals(db *sql.DB, team string) (float64, float64, error) {
+	var avgFullTimeHomeTeamGoals float64
+	var avgFullTimeAwayTeamGoals float64
+	if err := db.QueryRow(`SELECT avg(full_time_home_team_goals), avg(full_time_away_team_goals)
+		FROM public.match_results WHERE home_team = $1`, team).Scan(
+		&avgFullTimeHomeTeamGoals,
+		&avgFullTimeAwayTeamGoals,
+	); err != nil {
+		return 0, 0, err
+	}
+
+	return avgFullTimeHomeTeamGoals, avgFullTimeAwayTeamGoals, nil
+}
+
+func SelectAwayTeamAvgGoals(db *sql.DB, team string) (float64, float64, error) {
+	var avgFullTimeHomeTeamGoals float64
+	var avgFullTimeAwayTeamGoals float64
+	if err := db.QueryRow(`SELECT avg(full_time_away_team_goals), avg(full_time_home_team_goals)
+		FROM public.match_results WHERE away_team = $1`, team).Scan(
+		&avgFullTimeAwayTeamGoals,
+		&avgFullTimeHomeTeamGoals,
+	); err != nil {
+		return 0, 0, err
+	}
+
+	return avgFullTimeAwayTeamGoals, avgFullTimeHomeTeamGoals, nil
+}
+
+type Results struct {
+	HomeTeam              string
+	AwayTeam              string
+	Result                string
+	FullTimeHomeTeamGoals int
+	FullTimeAwayTeamGoals int
+}
+
+func SelectLastFiveGamesByTeam(db *sql.DB, team string) ([]Results, error) {
+	fullTimeResults := make([]Results, 0)
+	rows, err := db.Query(`SELECT home_team, away_team, full_time_result
+		FROM public.match_results
+		WHERE home_team = $1 OR away_team = $1
+		ORDER BY date_start desc
+		LIMIT 5`, team)
+	if err != nil {
+		panic(err)
+	}
+	var result string
+	var homeTeam string
+	var awayTeam string
+	for rows.Next() {
+		rows.Scan(&homeTeam, &awayTeam, &result)
+		fullTimeResults = append(fullTimeResults, Results{HomeTeam: homeTeam, AwayTeam: awayTeam, Result: result})
+	}
+
+	return fullTimeResults, nil
+}
+
+func SelectAgainstEachOtherResults(db *sql.DB, team1 string, team2 string) ([]Results, error) {
+	fullTimeResults := make([]Results, 0)
+	rows, err := db.Query(`SELECT home_team, away_team, full_time_home_team_goals, full_time_away_team_goals, full_time_result
+	FROM public.match_results
+	WHERE (home_team = $1 AND away_team = $2) OR (home_team = $2 AND away_team = $1)
+	LIMIT 5`, team1, team2)
+	if err != nil {
+		panic(err)
+	}
+	var result string
+	var homeTeam string
+	var awayTeam string
+	var homeGoals int
+	var awayGoals int
+	for rows.Next() {
+		rows.Scan(&homeTeam, &awayTeam, &homeGoals, &awayGoals, &result)
+		fullTimeResults = append(fullTimeResults, Results{
+			HomeTeam:              homeTeam,
+			AwayTeam:              awayTeam,
+			Result:                result,
+			FullTimeHomeTeamGoals: homeGoals,
+			FullTimeAwayTeamGoals: awayGoals,
+		})
+	}
+
+	return fullTimeResults, nil
+}
+
 func InsertLeagues(db *sql.DB, leagues []models.League) {
 	for _, league := range leagues {
 		fmt.Println(league)
