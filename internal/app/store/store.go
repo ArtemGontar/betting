@@ -1,16 +1,5 @@
 package store
 
-import "database/sql"
-
-func NewDB(databaseURL string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", databaseURL)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := db.Ping(); err != nil {
-		return nil, err
-	}
-
-	return db, nil
+type Store interface {
+	MatchResult() MatchResultRepository
 }

@@ -6,11 +6,12 @@ import (
 	"net/http"
 
 	"github.com/ArtemGontar/betting/internal/app/store"
+	"github.com/ArtemGontar/betting/internal/app/store/sqlstore"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	db, err := store.NewDB("host=localhost dbname=betting sslmode=disable user=postgres password=cce16cc03cfb49c9b247fc6faff58fa7")
+	store, err := sqlstore.New("host=localhost dbname=betting sslmode=disable user=postgres password=cce16cc03cfb49c9b247fc6faff58fa7")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -30,12 +31,12 @@ func main() {
 
 	homeTeam := "Man United"
 	awayTeam := "Everton"
-	avgHomeScoredGoals, avgHomeConcededGoals, err := store.SelectHomeTeamAvgGoals(db, homeTeam)
+	avgHomeScoredGoals, avgHomeConcededGoals, err := store.MatchResult().SelectHomeTeamAvgGoals(homeTeam)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	homeFullTimeResults, err := store.SelectLastFiveGamesByTeam(db, homeTeam)
+	homeFullTimeResults, err := store.MatchResult().SelectLastFiveGamesByTeam(homeTeam)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -45,12 +46,12 @@ func main() {
 	fmt.Print(homeTeam, "Last 5 games results = ")
 	ProcessResults(homeFullTimeResults, homeTeam)
 
-	avgAwayScoredGoals, avgAwayConcededGoals, _ := store.SelectAwayTeamAvgGoals(db, awayTeam)
+	avgAwayScoredGoals, avgAwayConcededGoals, _ := store.MatchResult().SelectAwayTeamAvgGoals(awayTeam)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	awayFullTimeResults, _ := store.SelectLastFiveGamesByTeam(db, awayTeam)
+	awayFullTimeResults, _ := store.MatchResult().SelectLastFiveGamesByTeam(awayTeam)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -62,7 +63,7 @@ func main() {
 	ProcessResults(awayFullTimeResults, awayTeam)
 
 	// matches against each other (last 5)
-	eachOtherGames, err := store.SelectAgainstEachOtherResults(db, homeTeam, awayTeam)
+	eachOtherGames, err := store.MatchResult().SelectAgainstEachOtherResults(homeTeam, awayTeam)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -74,7 +75,7 @@ func main() {
 	//(Вероятность выигрыша) х (сумму потенциального выигрыша по текущему пари) – (вероятность проигрыша) х (сумму потенциального проигрыша по текущему пари).
 }
 
-func ProcessResults(results []store.Results, team string) {
+func ProcessResults(results []store.Result, team string) {
 	defer fmt.Println()
 	for _, result := range results {
 		if result.Result == "H" {
