@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/ArtemGontar/betting/internal/app/reader"
 	"github.com/ArtemGontar/betting/internal/app/store"
 	_ "github.com/lib/pq"
 )
@@ -26,11 +25,11 @@ func main() {
 	// 	"ef005110a34b481d9c1931075d779c71ed33058d80834b48b852b469bb5e7742")
 	// fmt.Println(string(rawData))
 
-	matchesResults := reader.ReadMatchResultsFromDataset("dataset/E0_2021_2.csv")
-	store.InsertMatchResults(db, matchesResults)
+	//matchesResults := reader.ReadMatchResultsFromDataset("dataset/E0_2021_2.csv")
+	//store.InsertMatchResults(db, matchesResults)
 
-	homeTeam := "Everton"
-	awayTeam := "Chelsea"
+	homeTeam := "Man United"
+	awayTeam := "Everton"
 	avgHomeScoredGoals, avgHomeConcededGoals, err := store.SelectHomeTeamAvgGoals(db, homeTeam)
 	if err != nil {
 		fmt.Println(err)
@@ -62,12 +61,17 @@ func main() {
 	fmt.Print(homeTeam, "Last 5 games results = ")
 	ProcessResults(awayFullTimeResults, awayTeam)
 
+	// matches against each other (last 5)
 	eachOtherGames, err := store.SelectAgainstEachOtherResults(db, homeTeam, awayTeam)
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	fmt.Println(eachOtherGames)
+
+	//Poison theory https://www.sports.ru/tribuna/blogs/foranol/717591.html
+
+	// Для расчета мат. ожидания есть даже формула:
+	//(Вероятность выигрыша) х (сумму потенциального выигрыша по текущему пари) – (вероятность проигрыша) х (сумму потенциального проигрыша по текущему пари).
 }
 
 func ProcessResults(results []store.Results, team string) {

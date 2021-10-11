@@ -8,10 +8,10 @@ import (
 	"github.com/ArtemGontar/betting/internal/app/models"
 )
 
-func ReadMatchResultsFromDataset(filePath string) []models.MatchResult {
+func ReadMatchResultsFromDataset(filePath string) ([]models.MatchResult, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	defer file.Close()
@@ -28,5 +28,5 @@ func ReadMatchResultsFromDataset(filePath string) []models.MatchResult {
 		matchesResults = append(matchesResults, arrToMatchResultsMapping(record))
 	}
 
-	return matchesResults
+	return matchesResults, nil
 }
