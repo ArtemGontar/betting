@@ -11,6 +11,20 @@ type MatchResultRepository struct {
 	store *Store
 }
 
+func (r *MatchResultRepository) SelectLeagueAvgScoredGoals(league int) (float64, float64, error) {
+	var avgFullTimeHomeLeagueGoals float64
+	var avgFullTimeAwayLeagueGoals float64
+	if err := r.store.db.QueryRow(`SELECT avg(full_time_home_team_goals), avg(full_time_away_team_goals)
+		FROM public.match_results WHERE league_id = $1`, league).Scan(
+		&avgFullTimeHomeLeagueGoals,
+		&avgFullTimeAwayLeagueGoals,
+	); err != nil {
+		return 0, 0, err
+	}
+
+	return avgFullTimeHomeLeagueGoals, avgFullTimeAwayLeagueGoals, nil
+}
+
 func (r *MatchResultRepository) SelectHomeTeamAvgGoals(team string) (float64, float64, error) {
 	var avgFullTimeHomeTeamGoals float64
 	var avgFullTimeAwayTeamGoals float64

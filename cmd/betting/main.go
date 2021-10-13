@@ -3,12 +3,15 @@ package main
 import (
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 
 	"github.com/ArtemGontar/betting/internal/app/store"
 	"github.com/ArtemGontar/betting/internal/app/store/sqlstore"
 	_ "github.com/lib/pq"
 )
+
+var e = 2.71828182845904523536028747135266249
 
 func main() {
 	store, err := sqlstore.New("host=localhost dbname=betting sslmode=disable user=postgres password=cce16cc03cfb49c9b247fc6faff58fa7")
@@ -29,6 +32,20 @@ func main() {
 	//matchesResults := reader.ReadMatchResultsFromDataset("dataset/E0_2021_2.csv")
 	//store.InsertMatchResults(db, matchesResults)
 
+	// League avg statistic
+	league := 1
+	avgLeagueHomeScoredGoals, avgLeagueAwayScoredGoals, err := store.MatchResult().SelectLeagueAvgScoredGoals(league)
+	if err != nil {
+		fmt.Println(err)
+	}
+	avgLeagueHomeConcededGoals := avgLeagueAwayScoredGoals
+	avgLeagueAwayConcededGoals := avgLeagueHomeScoredGoals
+
+	fmt.Println(league, "avg home scored goals =", avgLeagueHomeScoredGoals)
+	fmt.Println(league, "avg away scored goals =", avgLeagueAwayScoredGoals)
+	fmt.Println(league, "avg home conceded goals =", avgLeagueHomeConcededGoals)
+	fmt.Println(league, "avg away conceded goals =", avgLeagueAwayConcededGoals)
+
 	homeTeam := "Man United"
 	awayTeam := "Everton"
 	avgHomeScoredGoals, avgHomeConcededGoals, err := store.MatchResult().SelectHomeTeamAvgGoals(homeTeam)
@@ -45,6 +62,11 @@ func main() {
 	fmt.Println(homeTeam, "Avg home conceded goals =", avgHomeConcededGoals)
 	fmt.Print(homeTeam, "Last 5 games results = ")
 	ProcessResults(homeFullTimeResults, homeTeam)
+	//Poison theory
+	homeAttackPower := avgHomeScoredGoals / avgLeagueHomeScoredGoals
+	homeDefencePower := avgHomeConcededGoals / avgLeagueHomeConcededGoals
+	fmt.Println(homeTeam, "attack power =", homeAttackPower)
+	fmt.Println(homeTeam, "defence power =", homeDefencePower)
 
 	avgAwayScoredGoals, avgAwayConcededGoals, _ := store.MatchResult().SelectAwayTeamAvgGoals(awayTeam)
 	if err != nil {
@@ -61,6 +83,23 @@ func main() {
 	fmt.Println(awayTeam, "Avg home conceded goals =", avgAwayConcededGoals)
 	fmt.Print(homeTeam, "Last 5 games results = ")
 	ProcessResults(awayFullTimeResults, awayTeam)
+	//Poison theory
+	awayAttackPower := avgAwayScoredGoals / avgLeagueAwayScoredGoals
+	awayDefencePower := avgAwayConcededGoals / avgLeagueAwayConcededGoals
+	fmt.Println(awayTeam, "attack power =", awayAttackPower)
+	fmt.Println(awayTeam, "defence power =", awayDefencePower)
+
+	//вероятное количество голов атакующей
+	homePredictScore := homeAttackPower * awayDefencePower * avgHomeScoredGoals
+	fmt.Println(homeTeam, "predict score =", homePredictScore)
+	awayPredictScore := awayAttackPower * homeDefencePower * avgAwayScoredGoals
+	fmt.Println(awayTeam, "predict score =", awayPredictScore)
+	//1.213^(5)*e^(-1.213)/(5!)
+	homePoisson := []float64{}
+	for i := 0; i < 5; i++ {
+		homePoisson = append(homePoisson, math.Pow(homePredictScore, (float64(i)))*math.Pow(e, -homePredictScore)/float64(factorial(i)))
+		fmt.Println("Goals", i, "possibility", homePoisson[i])
+	}
 
 	// matches against each other (last 5)
 	eachOtherGames, err := store.MatchResult().SelectAgainstEachOtherResults(homeTeam, awayTeam)
@@ -69,10 +108,16 @@ func main() {
 	}
 	fmt.Println(eachOtherGames)
 
-	//Poison theory https://www.sports.ru/tribuna/blogs/foranol/717591.html
-
 	// Для расчета мат. ожидания есть даже формула:
 	//(Вероятность выигрыша) х (сумму потенциального выигрыша по текущему пари) – (вероятность проигрыша) х (сумму потенциального проигрыша по текущему пари).
+}
+
+func factorial(n int) int {
+
+	if n == 0 {
+		return 1
+	}
+	return n * factorial(n-1)
 }
 
 func ProcessResults(results []store.Result, team string) {
