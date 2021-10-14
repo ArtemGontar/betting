@@ -15,10 +15,6 @@ func LeagueAvgStatistics(store store.Store, league int) model.LeagueAvgStatistic
 	}
 	avgHomeConcededGoals := avgAwayScoredGoals
 	avgAwayConcededGoals := avgHomeScoredGoals
-	fmt.Println(league, "avg home scored goals =", avgHomeScoredGoals)
-	fmt.Println(league, "avg away scored goals =", avgAwayScoredGoals)
-	fmt.Println(league, "avg home conceded goals =", avgHomeConcededGoals)
-	fmt.Println(league, "avg away conceded goals =", avgAwayConcededGoals)
 
 	return model.LeagueAvgStatistic{
 		AvgHomeScoredGoals:   avgHomeScoredGoals,
