@@ -11,17 +11,10 @@ type Store struct {
 	matchResultRepository *MatchResultRepository
 }
 
-func New(databaseURL string) (*Store, error) {
-	db, err := sql.Open("postgres", databaseURL)
-	if err != nil {
-		return nil, err
+func New(db *sql.DB) *Store {
+	return &Store{
+		db: db,
 	}
-
-	if err := db.Ping(); err != nil {
-		return nil, err
-	}
-
-	return &Store{db: db}, nil
 }
 
 func (s *Store) MatchResult() store.MatchResultRepository {

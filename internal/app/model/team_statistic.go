@@ -1,7 +1,8 @@
-package models
+package model
 
 type TeamStatistic struct {
 	TeamName            string
+	IsHome              bool
 	AttackPower         float64
 	DefencePower        float64
 	AvgScoredGoals      float64

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ArtemGontar/betting/internal/app/models"
+	"github.com/ArtemGontar/betting/internal/app/model"
 )
 
-func ReadMatchResultsFromDataset(filePath string) ([]models.MatchResult, error) {
+func ReadMatchResultsFromDataset(filePath string) ([]model.MatchResult, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -16,7 +16,7 @@ func ReadMatchResultsFromDataset(filePath string) ([]models.MatchResult, error) 
 
 	defer file.Close()
 
-	matchesResults := []models.MatchResult{}
+	matchesResults := []model.MatchResult{}
 	reader := csv.NewReader(file)
 	reader.FieldsPerRecord = 23
 	for {

@@ -3,7 +3,7 @@ package sqlstore
 import (
 	"fmt"
 
-	"github.com/ArtemGontar/betting/internal/app/models"
+	"github.com/ArtemGontar/betting/internal/app/model"
 	"github.com/ArtemGontar/betting/internal/app/store"
 )
 
@@ -25,32 +25,28 @@ func (r *MatchResultRepository) SelectLeagueAvgScoredGoals(league int) (float64,
 	return avgFullTimeHomeLeagueGoals, avgFullTimeAwayLeagueGoals, nil
 }
 
-func (r *MatchResultRepository) SelectHomeTeamAvgGoals(team string) (float64, float64, error) {
+func (r *MatchResultRepository) SelectTeamAvgGoals(team string, isHome bool) (float64, float64, error) {
 	var avgFullTimeHomeTeamGoals float64
 	var avgFullTimeAwayTeamGoals float64
-	if err := r.store.db.QueryRow(`SELECT avg(full_time_home_team_goals), avg(full_time_away_team_goals)
+	if isHome {
+		if err := r.store.db.QueryRow(`SELECT avg(full_time_home_team_goals), avg(full_time_away_team_goals)
 		FROM public.match_results WHERE home_team = $1`, team).Scan(
-		&avgFullTimeHomeTeamGoals,
-		&avgFullTimeAwayTeamGoals,
-	); err != nil {
-		return 0, 0, err
+			&avgFullTimeHomeTeamGoals,
+			&avgFullTimeAwayTeamGoals,
+		); err != nil {
+			return 0, 0, err
+		}
+	} else {
+		if err := r.store.db.QueryRow(`SELECT avg(full_time_away_team_goals), avg(full_time_home_team_goals)
+		FROM public.match_results WHERE away_team = $1`, team).Scan(
+			&avgFullTimeAwayTeamGoals,
+			&avgFullTimeHomeTeamGoals,
+		); err != nil {
+			return 0, 0, err
+		}
 	}
 
 	return avgFullTimeHomeTeamGoals, avgFullTimeAwayTeamGoals, nil
-}
-
-func (r *MatchResultRepository) SelectAwayTeamAvgGoals(team string) (float64, float64, error) {
-	var avgFullTimeHomeTeamGoals float64
-	var avgFullTimeAwayTeamGoals float64
-	if err := r.store.db.QueryRow(`SELECT avg(full_time_away_team_goals), avg(full_time_home_team_goals)
-		FROM public.match_results WHERE away_team = $1`, team).Scan(
-		&avgFullTimeAwayTeamGoals,
-		&avgFullTimeHomeTeamGoals,
-	); err != nil {
-		return 0, 0, err
-	}
-
-	return avgFullTimeAwayTeamGoals, avgFullTimeHomeTeamGoals, nil
 }
 
 func (r *MatchResultRepository) SelectLastFiveGamesByTeam(team string) ([]store.Result, error) {
@@ -102,7 +98,7 @@ func (r *MatchResultRepository) SelectAgainstEachOtherResults(team1 string, team
 	return fullTimeResults, nil
 }
 
-func (r *MatchResultRepository) InsertMatchResults(matchResults []models.MatchResult) {
+func (r *MatchResultRepository) InsertMatchResults(matchResults []model.MatchResult) {
 	for _, matchResult := range matchResults {
 		fmt.Println(matchResult)
 		_, err := r.store.db.Exec(`INSERT INTO public.match_results (home_team, home_team_id, full_time_home_team_goals, 

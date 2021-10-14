@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/ArtemGontar/betting/internal/app/models"
+	"github.com/ArtemGontar/betting/internal/app/model"
 	"github.com/ArtemGontar/betting/internal/app/store"
 )
 
-func LeagueAvgStatistics(store store.Store, league int) models.LeagueAvgStatistic {
+func LeagueAvgStatistics(store store.Store, league int) model.LeagueAvgStatistic {
 	avgHomeScoredGoals, avgAwayScoredGoals, err := store.MatchResult().SelectLeagueAvgScoredGoals(league)
 	if err != nil {
 		fmt.Println(err)
@@ -20,7 +20,7 @@ func LeagueAvgStatistics(store store.Store, league int) models.LeagueAvgStatisti
 	fmt.Println(league, "avg home conceded goals =", avgHomeConcededGoals)
 	fmt.Println(league, "avg away conceded goals =", avgAwayConcededGoals)
 
-	return models.LeagueAvgStatistic{
+	return model.LeagueAvgStatistic{
 		AvgHomeScoredGoals:   avgHomeScoredGoals,
 		AvgHomeConcededGoals: avgHomeConcededGoals,
 		AvgAwayScoredGoals:   avgAwayScoredGoals,
@@ -28,8 +28,8 @@ func LeagueAvgStatistics(store store.Store, league int) models.LeagueAvgStatisti
 	}
 }
 
-func TeamStatistics(store store.Store, teamStat *models.TeamStatistic, avgLeagueScoredGoals float64, avgLeagueConcededGoals float64) {
-	avgScoredGoals, avgConcededGoals, err := store.MatchResult().SelectHomeTeamAvgGoals(teamStat.TeamName)
+func TeamStatistics(store store.Store, teamStat *model.TeamStatistic, avgLeagueScoredGoals float64, avgLeagueConcededGoals float64) {
+	avgScoredGoals, avgConcededGoals, err := store.MatchResult().SelectTeamAvgGoals(teamStat.TeamName, teamStat.IsHome)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -50,7 +50,7 @@ func TeamStatistics(store store.Store, teamStat *models.TeamStatistic, avgLeague
 	teamStat.AvgConcededGoals = avgConcededGoals
 }
 
-func PoissonDistribution(teamForStat *models.TeamStatistic, teamAgainstStat models.TeamStatistic, avgScoredGoals float64) {
+func PoissonDistribution(teamForStat *model.TeamStatistic, teamAgainstStat model.TeamStatistic, avgScoredGoals float64) {
 	predictScore := teamForStat.AttackPower * teamAgainstStat.DefencePower * avgScoredGoals
 
 	//1.213^(5)*e^(-1.213)/(5!)

@@ -4,10 +4,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ArtemGontar/betting/internal/app/models"
+	"github.com/ArtemGontar/betting/internal/app/model"
 )
 
-func arrToMatchResultsMapping(record []string) models.MatchResult {
+func arrToMatchResultsMapping(record []string) model.MatchResult {
 	fullTimeHomeTeamGoals, _ := strconv.Atoi(record[4])
 	fullTimeAwayTeamGoals, _ := strconv.Atoi(record[5])
 
@@ -33,7 +33,7 @@ func arrToMatchResultsMapping(record []string) models.MatchResult {
 	awayTeamRedCards, _ := strconv.Atoi(record[22])
 
 	dateStart, _ := time.Parse(time.RFC3339, record[1])
-	matches := models.MatchResult{
+	matches := model.MatchResult{
 		HomeTeam:               record[2],
 		HomeTeamId:             0,
 		FullTimeHomeTeamGoals:  fullTimeHomeTeamGoals,
