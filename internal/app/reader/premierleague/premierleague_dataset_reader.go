@@ -1,4 +1,4 @@
-package premierleague_reader
+package premierleague
 
 import (
 	"fmt"
