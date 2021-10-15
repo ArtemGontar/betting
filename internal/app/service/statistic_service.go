@@ -8,15 +8,14 @@ import (
 	"github.com/ArtemGontar/betting/internal/app/store"
 )
 
-func LeagueAvgStatistics(store store.Store, league int) model.LeagueAvgStatistic {
+func LeagueStatistics(store store.Store, league int) model.LeagueStatistic {
 	avgHomeScoredGoals, avgAwayScoredGoals, err := store.MatchResult().SelectLeagueAvgScoredGoals(league)
 	if err != nil {
 		fmt.Println(err)
 	}
 	avgHomeConcededGoals := avgAwayScoredGoals
 	avgAwayConcededGoals := avgHomeScoredGoals
-
-	return model.LeagueAvgStatistic{
+	return model.LeagueStatistic{
 		AvgHomeScoredGoals:   avgHomeScoredGoals,
 		AvgHomeConcededGoals: avgHomeConcededGoals,
 		AvgAwayScoredGoals:   avgAwayScoredGoals,
@@ -46,8 +45,16 @@ func TeamStatistics(store store.Store, teamStat *model.TeamStatistic, avgLeagueS
 	teamStat.AvgConcededGoals = avgConcededGoals
 }
 
-func PoissonDistribution(teamForStat *model.TeamStatistic, teamAgainstStat model.TeamStatistic, avgScoredGoals float64) {
-	predictScore := teamForStat.AttackPower * teamAgainstStat.DefencePower * avgScoredGoals
+func AgainstEachOtherResults(store store.Store, team1Stat *model.TeamStatistic, team2Stat *model.TeamStatistic) []model.Result {
+	eachOtherGames, err := store.MatchResult().SelectAgainstEachOtherResults(team1Stat.TeamName, team2Stat.TeamName)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return eachOtherGames
+}
+
+func PoissonDistribution(teamForStat *model.TeamStatistic, teamAgainstStat model.TeamStatistic, avgForScoredGoals float64) {
+	predictScore := teamForStat.AttackPower * teamAgainstStat.DefencePower * avgForScoredGoals
 
 	//1.213^(5)*e^(-1.213)/(5!)
 	poissonDistribution := []float64{}
@@ -59,7 +66,7 @@ func PoissonDistribution(teamForStat *model.TeamStatistic, teamAgainstStat model
 	teamForStat.PoissonDistribution = poissonDistribution
 }
 
-func matchResults(results []store.Result, team string) []string {
+func matchResults(results []model.Result, team string) []string {
 	var resultsArr []string
 	for _, result := range results {
 		if result.Result == "H" {

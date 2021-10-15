@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/ArtemGontar/betting/internal/app/model"
-	"github.com/ArtemGontar/betting/internal/app/store"
 )
 
 type MatchResultRepository struct {
@@ -49,8 +48,8 @@ func (r *MatchResultRepository) SelectTeamAvgGoals(team string, isHome bool) (fl
 	return avgFullTimeHomeTeamGoals, avgFullTimeAwayTeamGoals, nil
 }
 
-func (r *MatchResultRepository) SelectLastFiveGamesByTeam(team string) ([]store.Result, error) {
-	fullTimeResults := make([]store.Result, 0)
+func (r *MatchResultRepository) SelectLastFiveGamesByTeam(team string) ([]model.Result, error) {
+	fullTimeResults := make([]model.Result, 0)
 	rows, err := r.store.db.Query(`SELECT home_team, away_team, full_time_result
 		FROM public.match_results
 		WHERE home_team = $1 OR away_team = $1
@@ -64,14 +63,14 @@ func (r *MatchResultRepository) SelectLastFiveGamesByTeam(team string) ([]store.
 	var awayTeam string
 	for rows.Next() {
 		rows.Scan(&homeTeam, &awayTeam, &result)
-		fullTimeResults = append(fullTimeResults, store.Result{HomeTeam: homeTeam, AwayTeam: awayTeam, Result: result})
+		fullTimeResults = append(fullTimeResults, model.Result{HomeTeam: homeTeam, AwayTeam: awayTeam, Result: result})
 	}
 
 	return fullTimeResults, nil
 }
 
-func (r *MatchResultRepository) SelectAgainstEachOtherResults(team1 string, team2 string) ([]store.Result, error) {
-	fullTimeResults := make([]store.Result, 0)
+func (r *MatchResultRepository) SelectAgainstEachOtherResults(team1 string, team2 string) ([]model.Result, error) {
+	fullTimeResults := make([]model.Result, 0)
 	rows, err := r.store.db.Query(`SELECT home_team, away_team, full_time_home_team_goals, full_time_away_team_goals, full_time_result
 	FROM public.match_results
 	WHERE (home_team = $1 AND away_team = $2) OR (home_team = $2 AND away_team = $1)
@@ -86,7 +85,7 @@ func (r *MatchResultRepository) SelectAgainstEachOtherResults(team1 string, team
 	var awayGoals int
 	for rows.Next() {
 		rows.Scan(&homeTeam, &awayTeam, &homeGoals, &awayGoals, &result)
-		fullTimeResults = append(fullTimeResults, store.Result{
+		fullTimeResults = append(fullTimeResults, model.Result{
 			HomeTeam:              homeTeam,
 			AwayTeam:              awayTeam,
 			Result:                result,

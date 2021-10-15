@@ -38,9 +38,10 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) configureRouter() {
 	s.router.HandleFunc("/hello", s.handleHello()).Methods("GET")
-	s.router.HandleFunc("/leagues/{id:[0-9]+}/stat", s.GetAvgLeagueStatisticHandler()).Methods("GET")
-	s.router.HandleFunc("/teams/{name:\\w+}/stat", s.GetTeamStatisticHandler()).Methods("GET")
 	s.router.HandleFunc("/match-results/batch", s.FillFromDatasetHandler()).Methods("POST")
+	s.router.HandleFunc("/leagues/{id:[0-9]+}/statistic", s.GetAvgLeagueStatisticHandler()).Methods("GET")
+	s.router.HandleFunc("/teams/{name:\\w+}/statistic", s.GetTeamStatisticHandler()).Methods("GET")
+	s.router.HandleFunc("/match/statistic", s.GetMatchStatisticHandler()).Methods("GET")
 }
 
 func (s *server) handleHello() http.HandlerFunc {
@@ -77,7 +78,7 @@ func (s *server) GetAvgLeagueStatisticHandler() http.HandlerFunc {
 		if e == nil {
 			fmt.Printf("%T \n %v", id, id)
 		}
-		resp := service.LeagueAvgStatistics(s.store, id)
+		resp := service.LeagueStatistics(s.store, id)
 		s.respond(rw, r, http.StatusCreated, resp)
 	}
 }
@@ -91,9 +92,44 @@ func (s *server) GetTeamStatisticHandler() http.HandlerFunc {
 			TeamName: name,
 		}
 		league := 1
-		leagueStatistic := service.LeagueAvgStatistics(s.store, league)
+		leagueStatistic := service.LeagueStatistics(s.store, league)
 		service.TeamStatistics(s.store, &teamStat, leagueStatistic.AvgHomeScoredGoals, leagueStatistic.AvgHomeConcededGoals)
 		s.respond(rw, r, http.StatusCreated, teamStat)
+	}
+}
+
+func (s *server) GetMatchStatisticHandler() http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		league := 1
+		homeTeam := r.URL.Query().Get("homeTeam")
+		awayTeam := r.URL.Query().Get("awayTeam")
+
+		homeTeamStat := model.TeamStatistic{
+			TeamName: homeTeam,
+			IsHome:   true,
+		}
+		awayTeamStat := model.TeamStatistic{
+			TeamName: awayTeam,
+			IsHome:   false,
+		}
+
+		leagueStat := service.LeagueStatistics(s.store, league)
+		service.TeamStatistics(s.store, &homeTeamStat, leagueStat.AvgHomeScoredGoals, leagueStat.AvgHomeConcededGoals)
+		service.TeamStatistics(s.store, &awayTeamStat, leagueStat.AvgAwayScoredGoals, leagueStat.AvgAwayConcededGoals)
+		service.PoissonDistribution(&homeTeamStat, awayTeamStat, leagueStat.AvgHomeScoredGoals)
+		service.PoissonDistribution(&awayTeamStat, homeTeamStat, leagueStat.AvgAwayScoredGoals)
+		// matches against each other (last 5)
+		eachOtherResult := service.AgainstEachOtherResults(s.store, &homeTeamStat, &awayTeamStat)
+		ms := model.MatchStatistic{
+			HomeTeamName:            homeTeam,
+			AwayTeamName:            awayTeam,
+			HomePredictScore:        homeTeamStat.PredictScore,
+			AwayPredictScore:        awayTeamStat.PredictScore,
+			HomePoissonDistribution: homeTeamStat.PoissonDistribution,
+			AwayPoissonDistribution: awayTeamStat.PoissonDistribution,
+			AgainstEachOtherResult:  eachOtherResult,
+		}
+		s.respond(rw, r, http.StatusCreated, ms)
 	}
 }
 

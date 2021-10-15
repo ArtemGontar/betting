@@ -1,6 +1,6 @@
 package model
 
-type LeagueAvgStatistic struct {
+type LeagueStatistic struct {
 	AvgHomeScoredGoals   float64
 	AvgAwayScoredGoals   float64
 	AvgHomeConcededGoals float64
