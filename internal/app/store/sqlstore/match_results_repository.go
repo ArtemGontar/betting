@@ -99,7 +99,6 @@ func (r *MatchResultRepository) SelectAgainstEachOtherResults(team1 string, team
 
 func (r *MatchResultRepository) InsertMatchResults(matchResults []model.MatchResult) {
 	for _, matchResult := range matchResults {
-		fmt.Println(matchResult)
 		_, err := r.store.db.Exec(`INSERT INTO public.match_results (home_team, home_team_id, full_time_home_team_goals, 
 				half_time_home_team_goals, home_team_shots, home_team_shots_on_target, home_team_corners,
 				home_team_fouls_committed, home_team_yellow_cards, home_team_red_cards, away_team, away_team_id,

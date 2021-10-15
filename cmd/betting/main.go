@@ -29,16 +29,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Для расчета мат. ожидания есть даже формула:
+	// расчет мат. ожидания
 	//(Вероятность выигрыша) х (сумму потенциального выигрыша по текущему пари) – (вероятность проигрыша) х (сумму потенциального проигрыша по текущему пари).
 }
-
-// func PrintTeamStats(teamStat models.TeamStatistic) {
-// 	fmt.Println(teamStat.TeamName, "avg scored goals =", teamStat.AvgScoredGoals)
-// 	fmt.Println(teamStat.TeamName, "avg conceded goals =", teamStat.AvgConcededGoals)
-// 	fmt.Println(teamStat.TeamName, "last 5 games results = ", teamStat.FullTimeResults)
-// 	fmt.Println(teamStat.TeamName, "attack power =", teamStat.AttackPower)
-// 	fmt.Println(teamStat.TeamName, "defence power =", teamStat.DefencePower)
-// 	fmt.Println(teamStat.TeamName, "predict score =", teamStat.PredictScore)
-// 	fmt.Println("Goals", "possibility", teamStat.PoissonDistribution)
-// }

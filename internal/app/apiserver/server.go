@@ -2,7 +2,6 @@ package apiserver
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -61,12 +60,16 @@ func (s *server) FillFromDatasetHandler() http.HandlerFunc {
 			return
 		}
 
+		s.logger.Info("Fill from dataset with name", req.DatasetName)
+
 		matchesResults, err := reader.ReadMatchResultsFromDataset("datasets/" + req.DatasetName)
 		if err != nil {
 			s.respond(rw, r, http.StatusCreated, err)
 		}
+		s.logger.Info("Successfully readed from dataset", req.DatasetName)
 		s.store.MatchResult().InsertMatchResults(matchesResults)
-		s.respond(rw, r, http.StatusCreated, "Success")
+		s.logger.Info("Successfully insert match results")
+		s.respond(rw, r, http.StatusCreated, matchesResults)
 	}
 }
 
@@ -75,9 +78,10 @@ func (s *server) GetAvgLeagueStatisticHandler() http.HandlerFunc {
 		vars := mux.Vars(r)
 		idString := vars["id"]
 		id, e := strconv.Atoi(idString)
-		if e == nil {
-			fmt.Printf("%T \n %v", id, id)
+		if e != nil {
+			s.logger.Error(e)
 		}
+		s.logger.Info("GetAvgLeagueStatistic for league", id)
 		resp := service.LeagueStatistics(s.store, id)
 		s.respond(rw, r, http.StatusCreated, resp)
 	}
@@ -87,7 +91,7 @@ func (s *server) GetTeamStatisticHandler() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		name := vars["name"]
-
+		s.logger.Info("GetTeamStatisticHandler for team", name)
 		teamStat := model.TeamStatistic{
 			TeamName: name,
 		}
@@ -103,7 +107,7 @@ func (s *server) GetMatchStatisticHandler() http.HandlerFunc {
 		league := 1
 		homeTeam := r.URL.Query().Get("homeTeam")
 		awayTeam := r.URL.Query().Get("awayTeam")
-
+		s.logger.Info("GetMatchStatisticHandler for %s - %s", homeTeam, awayTeam)
 		homeTeamStat := model.TeamStatistic{
 			TeamName: homeTeam,
 			IsHome:   true,
