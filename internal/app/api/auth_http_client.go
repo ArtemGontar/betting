@@ -6,12 +6,11 @@ import (
 	"net/http"
 )
 
-func authHttpRequest(url string, httpVerb string, authToken string, requestBody io.Reader) []byte {
+func HttpRequest(url string, httpVerb string, requestBody io.Reader) []byte {
 	client := http.Client{}
 	req, err := http.NewRequest(
 		httpVerb, url, requestBody,
 	)
-	req.Header.Add("Authorization", authToken)
 
 	response, err := client.Do(req)
 	if err != nil {

@@ -1,16 +1,25 @@
 package apiserver
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/ArtemGontar/betting/internal/app/model"
 	"github.com/ArtemGontar/betting/internal/app/reader"
 	"github.com/ArtemGontar/betting/internal/app/service"
 	"github.com/ArtemGontar/betting/internal/app/store"
+	"github.com/google/uuid"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	ctxKeyUser ctxKey = iota
+	ctxKeyRequestID
 )
 
 type server struct {
@@ -18,6 +27,8 @@ type server struct {
 	logger *logrus.Logger
 	store  store.Store
 }
+
+type ctxKey int8
 
 func newServer(store store.Store) *server {
 	s := &server{
@@ -36,11 +47,37 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
+	s.router.Use(s.setRequestID)
+	s.router.Use(s.logRequest)
+	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
 	s.router.HandleFunc("/hello", s.handleHello()).Methods("GET")
 	s.router.HandleFunc("/match-results/batch", s.FillFromDatasetHandler()).Methods("POST")
 	s.router.HandleFunc("/leagues/{id:[0-9]+}/statistic", s.GetAvgLeagueStatisticHandler()).Methods("GET")
 	s.router.HandleFunc("/teams/{name:\\w+}/statistic", s.GetTeamStatisticHandler()).Methods("GET")
 	s.router.HandleFunc("/match/statistic", s.GetMatchStatisticHandler()).Methods("GET")
+}
+
+func (s *server) setRequestID(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id := uuid.New().String()
+		w.Header().Set("X-Request-ID", id)
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyRequestID, id)))
+	})
+}
+
+func (s *server) logRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		logger := s.logger.WithFields(logrus.Fields{
+			"remote_addr": r.RemoteAddr,
+			"request_id":  r.Context().Value(ctxKeyRequestID),
+		})
+		logger.Infof("started %s %s", r.Method, r.RequestURI)
+
+		start := time.Now()
+		next.ServeHTTP(rw, r)
+		logger.Infof("completed in %v", time.Now().Sub(start))
+
+	})
 }
 
 func (s *server) handleHello() http.HandlerFunc {

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/ArtemGontar/betting/internal/app/apiserver"
+	premierleague_reader "github.com/ArtemGontar/betting/internal/app/reader/premierleague"
 	"github.com/BurntSushi/toml"
 	_ "github.com/lib/pq"
 )
@@ -18,6 +19,11 @@ func init() {
 }
 
 func main() {
+	//premierleague_reader.Teams()
+	premierleague_reader.Players()
+}
+
+func apiServer() {
 	flag.Parse()
 	config := apiserver.NewConfig()
 	_, err := toml.DecodeFile(configPath, config)
@@ -28,7 +34,4 @@ func main() {
 	if err := apiserver.Start(config); err != nil {
 		log.Fatal(err)
 	}
-
-	// расчет мат. ожидания
-	//(Вероятность выигрыша) х (сумму потенциального выигрыша по текущему пари) – (вероятность проигрыша) х (сумму потенциального проигрыша по текущему пари).
 }
