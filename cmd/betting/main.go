@@ -5,12 +5,15 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"sort"
 
 	"github.com/ArtemGontar/betting/internal/app/apiserver"
 	"github.com/ArtemGontar/betting/internal/app/model"
 	"github.com/ArtemGontar/betting/internal/app/reader/premierleague"
 	"github.com/ArtemGontar/betting/internal/app/service"
-	"github.com/ArtemGontar/betting/internal/app/store/sqlstore"
+	league_service "github.com/ArtemGontar/betting/internal/app/service/league"
+	statistic_service "github.com/ArtemGontar/betting/internal/app/service/statistic"
+	match_results_repository "github.com/ArtemGontar/betting/internal/app/store/match_results"
 	"github.com/BurntSushi/toml"
 	_ "github.com/lib/pq"
 )
@@ -25,55 +28,78 @@ func init() {
 
 func main() {
 	teams := premierleague.Teams()
-	for i := range teams {
-		fmt.Println(teams[i].TeamName)
-	}
 	//premierleague_reader.Players()
 
-	// flag.Parse()
-	// config := apiserver.NewConfig()
-	// _, err := toml.DecodeFile(configPath, config)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(config.DatabaseURL)
-	// db, err := newDB(config.DatabaseURL)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	flag.Parse()
+	config := apiserver.NewConfig()
+	_, err := toml.DecodeFile(configPath, config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	db, err := newDB(config.DatabaseURL)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	// defer db.Close()
-	// store := sqlstore.New(db)
-	// simulationSeason(store, teams)
+	defer db.Close()
+	matchResultsRepository := match_results_repository.New(db)
+	statisticService := statistic_service.New(matchResultsRepository)
+	leagueService := league_service.New(matchResultsRepository)
+	matchResults := simulationSeason(leagueService, statisticService, teams)
+	table := leagueService.LeagueTable(matchResults)
+
+	sort.Slice(table, func(i, j int) bool {
+		return table[i].Points > table[j].Points
+	})
+	for _, row := range table {
+		fmt.Println(row.TeamName, row.MatchCount, row.ScoredGoals, row.ConcededGoals, row.Points)
+	}
 }
 
-func simulationSeason(store *sqlstore.Store, teams []model.Team) {
-	leagueStat := service.LeagueStatistics(store, 1)
+func simulationSeason(leagueService service.LeagueService, statisticService service.StatisticService, teams []model.Team) []model.MatchResult {
+	matchResults := []model.MatchResult{}
+	leagueStat := statisticService.LeagueStatistics(1)
 	for i := 0; i < len(teams); i++ {
 		team1 := model.TeamStatistic{
 			TeamName: teams[i].TeamName,
 			IsHome:   true,
 		}
-		service.TeamStatistics(store, &team1, leagueStat.AvgHomeScoredGoals, leagueStat.AvgHomeConcededGoals)
+		statisticService.TeamStatistics(&team1, leagueStat.AvgHomeScoredGoals, leagueStat.AvgHomeConcededGoals)
 		for j := 0; j < len(teams); j++ {
 			if teams[i].TeamName == teams[j].TeamName {
-				break
+				continue
 			}
 			team2 := model.TeamStatistic{
 				TeamName: teams[j].TeamName,
 				IsHome:   false,
 			}
-			service.TeamStatistics(store, &team2, leagueStat.AvgAwayScoredGoals, leagueStat.AvgAwayConcededGoals)
+			statisticService.TeamStatistics(&team2, leagueStat.AvgAwayScoredGoals, leagueStat.AvgAwayConcededGoals)
 
-			service.PoissonDistribution(&team1, team2, leagueStat.AvgHomeScoredGoals)
-			service.PoissonDistribution(&team2, team1, leagueStat.AvgAwayScoredGoals)
-
+			statisticService.PoissonDistribution(&team1, team2, leagueStat.AvgHomeScoredGoals)
+			statisticService.PoissonDistribution(&team2, team1, leagueStat.AvgAwayScoredGoals)
 			team1Goals := maxArrValue(team1.PoissonDistribution)
 			team2Goals := maxArrValue(team2.PoissonDistribution)
+			var mr string
+			if team1Goals > team2Goals {
+				mr = "H"
+			} else if team2Goals > team1Goals {
+				mr = "A"
+			} else {
+				mr = "D"
+			}
+			matchResult := model.MatchResult{
+				HomeTeam:              team1.TeamName,
+				FullTimeHomeTeamGoals: team1Goals,
+				AwayTeam:              team2.TeamName,
+				FullTimeAwayTeamGoals: team2Goals,
+				FullTimeResult:        mr,
+			}
+			matchResults = append(matchResults, matchResult)
+
 			fmt.Println(team1.TeamName, team1Goals, "-", team2Goals, team2.TeamName)
 		}
-
 	}
+	return matchResults
 }
 
 func maxArrValue(arr []float64) int {

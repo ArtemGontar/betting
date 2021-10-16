@@ -1,4 +1,4 @@
-package service
+package statistic_service
 
 import (
 	"fmt"
@@ -8,8 +8,18 @@ import (
 	"github.com/ArtemGontar/betting/internal/app/store"
 )
 
-func LeagueStatistics(store store.Store, league int) model.LeagueStatistic {
-	avgHomeScoredGoals, avgAwayScoredGoals, err := store.MatchResult().SelectLeagueAvgScoredGoals(league)
+type StatisticsService struct {
+	matchRepository store.MatchResultRepository
+}
+
+func New(matchRepository store.MatchResultRepository) *StatisticsService {
+	return &StatisticsService{
+		matchRepository: matchRepository,
+	}
+}
+
+func (ss *StatisticsService) LeagueStatistics(league int) model.LeagueStatistic {
+	avgHomeScoredGoals, avgAwayScoredGoals, err := ss.matchRepository.SelectLeagueAvgScoredGoals(league)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -23,13 +33,13 @@ func LeagueStatistics(store store.Store, league int) model.LeagueStatistic {
 	}
 }
 
-func TeamStatistics(store store.Store, teamStat *model.TeamStatistic, avgLeagueScoredGoals float64, avgLeagueConcededGoals float64) {
-	avgScoredGoals, avgConcededGoals, err := store.MatchResult().SelectTeamAvgGoals(teamStat.TeamName, teamStat.IsHome)
+func (ss *StatisticsService) TeamStatistics(teamStat *model.TeamStatistic, avgLeagueScoredGoals float64, avgLeagueConcededGoals float64) {
+	avgScoredGoals, avgConcededGoals, err := ss.matchRepository.SelectTeamAvgGoals(teamStat.TeamName, teamStat.IsHome)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fullTimeResults, err := store.MatchResult().SelectLastFiveGamesByTeam(teamStat.TeamName)
+	fullTimeResults, err := ss.matchRepository.SelectLastFiveGamesByTeam(teamStat.TeamName)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -45,15 +55,15 @@ func TeamStatistics(store store.Store, teamStat *model.TeamStatistic, avgLeagueS
 	teamStat.AvgConcededGoals = avgConcededGoals
 }
 
-func AgainstEachOtherResults(store store.Store, team1Stat *model.TeamStatistic, team2Stat *model.TeamStatistic) []model.Result {
-	eachOtherGames, err := store.MatchResult().SelectAgainstEachOtherResults(team1Stat.TeamName, team2Stat.TeamName)
+func (ss *StatisticsService) AgainstEachOtherResults(team1Stat *model.TeamStatistic, team2Stat *model.TeamStatistic) []model.Result {
+	eachOtherGames, err := ss.matchRepository.SelectAgainstEachOtherResults(team1Stat.TeamName, team2Stat.TeamName)
 	if err != nil {
 		fmt.Println(err)
 	}
 	return eachOtherGames
 }
 
-func PoissonDistribution(teamForStat *model.TeamStatistic, teamAgainstStat model.TeamStatistic, avgForScoredGoals float64) {
+func (ss *StatisticsService) PoissonDistribution(teamForStat *model.TeamStatistic, teamAgainstStat model.TeamStatistic, avgForScoredGoals float64) {
 	predictScore := teamForStat.AttackPower * teamAgainstStat.DefencePower * avgForScoredGoals
 
 	//1.213^(5)*e^(-1.213)/(5!)

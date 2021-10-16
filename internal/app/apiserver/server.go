@@ -10,7 +10,6 @@ import (
 	"github.com/ArtemGontar/betting/internal/app/model"
 	"github.com/ArtemGontar/betting/internal/app/reader"
 	"github.com/ArtemGontar/betting/internal/app/service"
-	"github.com/ArtemGontar/betting/internal/app/store"
 	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -23,18 +22,20 @@ const (
 )
 
 type server struct {
-	router *mux.Router
-	logger *logrus.Logger
-	store  store.Store
+	router           *mux.Router
+	logger           *logrus.Logger
+	leagueService    service.LeagueService
+	statisticService service.StatisticService
 }
 
 type ctxKey int8
 
-func newServer(store store.Store) *server {
+func newServer(leagueService service.LeagueService, statisticService service.StatisticService) *server {
 	s := &server{
-		router: mux.NewRouter(),
-		logger: logrus.New(),
-		store:  store,
+		router:           mux.NewRouter(),
+		logger:           logrus.New(),
+		leagueService:    leagueService,
+		statisticService: statisticService,
 	}
 
 	s.configureRouter()
@@ -104,7 +105,7 @@ func (s *server) FillFromDatasetHandler() http.HandlerFunc {
 			s.respond(rw, r, http.StatusCreated, err)
 		}
 		s.logger.Info("Successfully readed from dataset", req.DatasetName)
-		s.store.MatchResult().InsertMatchResults(matchesResults)
+		//s.matchService.InsertMatchResults(matchesResults)
 		s.logger.Info("Successfully insert match results")
 		s.respond(rw, r, http.StatusCreated, matchesResults)
 	}
@@ -119,7 +120,7 @@ func (s *server) GetAvgLeagueStatisticHandler() http.HandlerFunc {
 			s.logger.Error(e)
 		}
 		s.logger.Info("GetAvgLeagueStatistic for league", id)
-		resp := service.LeagueStatistics(s.store, id)
+		resp := s.statisticService.LeagueStatistics(id)
 		s.respond(rw, r, http.StatusCreated, resp)
 	}
 }
@@ -133,8 +134,8 @@ func (s *server) GetTeamStatisticHandler() http.HandlerFunc {
 			TeamName: name,
 		}
 		league := 1
-		leagueStatistic := service.LeagueStatistics(s.store, league)
-		service.TeamStatistics(s.store, &teamStat, leagueStatistic.AvgHomeScoredGoals, leagueStatistic.AvgHomeConcededGoals)
+		leagueStatistic := s.statisticService.LeagueStatistics(league)
+		s.statisticService.TeamStatistics(&teamStat, leagueStatistic.AvgHomeScoredGoals, leagueStatistic.AvgHomeConcededGoals)
 		s.respond(rw, r, http.StatusCreated, teamStat)
 	}
 }
@@ -154,13 +155,13 @@ func (s *server) GetMatchStatisticHandler() http.HandlerFunc {
 			IsHome:   false,
 		}
 
-		leagueStat := service.LeagueStatistics(s.store, league)
-		service.TeamStatistics(s.store, &homeTeamStat, leagueStat.AvgHomeScoredGoals, leagueStat.AvgHomeConcededGoals)
-		service.TeamStatistics(s.store, &awayTeamStat, leagueStat.AvgAwayScoredGoals, leagueStat.AvgAwayConcededGoals)
-		service.PoissonDistribution(&homeTeamStat, awayTeamStat, leagueStat.AvgHomeScoredGoals)
-		service.PoissonDistribution(&awayTeamStat, homeTeamStat, leagueStat.AvgAwayScoredGoals)
+		leagueStat := s.statisticService.LeagueStatistics(league)
+		s.statisticService.TeamStatistics(&homeTeamStat, leagueStat.AvgHomeScoredGoals, leagueStat.AvgHomeConcededGoals)
+		s.statisticService.TeamStatistics(&awayTeamStat, leagueStat.AvgAwayScoredGoals, leagueStat.AvgAwayConcededGoals)
+		s.statisticService.PoissonDistribution(&homeTeamStat, awayTeamStat, leagueStat.AvgHomeScoredGoals)
+		s.statisticService.PoissonDistribution(&awayTeamStat, homeTeamStat, leagueStat.AvgAwayScoredGoals)
 		// matches against each other (last 5)
-		eachOtherResult := service.AgainstEachOtherResults(s.store, &homeTeamStat, &awayTeamStat)
+		eachOtherResult := s.statisticService.AgainstEachOtherResults(&homeTeamStat, &awayTeamStat)
 		ms := model.MatchStatistic{
 			HomeTeamName:            homeTeam,
 			AwayTeamName:            awayTeam,
